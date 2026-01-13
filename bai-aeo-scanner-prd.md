@@ -1,10 +1,12 @@
 # Birmingham AI AEO Scanner — Product Requirements Document
 
-**Version:** 1.0
-**Date:** January 12, 2026
+**Version:** 1.1
+**Date:** January 13, 2026
 **Author:** Scott + Claude
-**Event Date:** January 14, 2026 (48 hours)
-**Status:** MVP Build Mode
+**Event Date:** January 14, 2026 (~30 hours)
+**Status:** Backend ✅ Complete | Frontend 🚧 In Progress
+
+**Deployed API:** https://baiaeo-production.up.railway.app
 
 ---
 
@@ -86,17 +88,23 @@ A web-based tool that scans any website's homepage and delivers 5 actionable AEO
                         └─────────────────┘
 ```
 
-### Backend API (Claude Code)
+### Backend API (✅ DEPLOYED)
+
+**Live URL:** https://baiaeo-production.up.railway.app
 
 **Tech Stack:**
-- Runtime: Node.js or Python (Claude Code default)
-- Framework: Express.js or FastAPI
-- HTML Fetching: Axios + Cheerio (Node) or Requests + BeautifulSoup (Python)
-- Hosting: Railway, Render, or Vercel Functions
+- Runtime: Node.js 20
+- Framework: Express.js
+- HTML Fetching: Axios + Cheerio
+- Hosting: Railway (auto-deploys from GitHub)
 
 **Endpoints:**
 
 ```
+GET /health
+  Response: { "status": "ok" }
+  Status: ✅ Live and tested
+
 POST /api/scan
   Request:  { "url": "https://example.com" }
   Response: {
@@ -108,10 +116,12 @@ POST /api/scan
     "checks": [...],
     "recommendations": [...]
   }
+  Status: ✅ Live and tested
 
-POST /api/email-results
+POST /api/email-results (STRETCH GOAL)
   Request:  { "email": "user@example.com", "scanId": "abc123" }
   Response: { "success": true, "message": "Results sent!" }
+  Status: ⏸️ Not implemented yet
 ```
 
 ### Frontend (Lovable)
@@ -192,26 +202,28 @@ CREATE TABLE email_submissions (
 | 14 | **Image Alt Text** | Alt attributes on images |
 | 15 | **Page Speed** | Basic TTFB check |
 
-### Scoring Algorithm
+### Scoring Algorithm (✅ IMPLEMENTED)
 
 ```javascript
-// Each check contributes to overall score
+// Each check worth 20 points (total = 100)
 const weights = {
-  headingHierarchy: 25,    // Most impactful
-  metaDescription: 15,
+  headingHierarchy: 20,
+  metaDescription: 20,
   schemaMarkup: 20,
   faqSection: 20,
   contentStructure: 20
 };
 
-// Score calculation
+// Score calculation - sum of all passing checks
 let score = 0;
-if (checks.headingHierarchy.pass) score += weights.headingHierarchy;
-if (checks.metaDescription.pass) score += weights.metaDescription;
-// ... etc
+if (checks.headingHierarchy.pass) score += 20;
+if (checks.metaDescription.pass) score += 20;
+if (checks.schemaMarkup.pass) score += 20;
+if (checks.faqSection.pass) score += 20;
+if (checks.contentStructure.pass) score += 20;
 
-// Grade mapping
-const grade = 
+// Grade mapping (0-100 scale)
+const grade =
   score >= 90 ? 'A' :
   score >= 80 ? 'B' :
   score >= 70 ? 'C' :
@@ -288,29 +300,29 @@ Always show exactly 5 recommendations, prioritized by:
 
 ## 7. Build Timeline
 
-### Day 1: Sunday January 12 (Today)
+### Day 1: Sunday January 12 ✅ COMPLETE
 
 | Time | Task | Deliverable |
 |------|------|-------------|
 | Now | ✅ PRD Complete | This document |
-| +1 hr | Backend scaffold | Express/FastAPI app with /health endpoint |
-| +2 hr | HTML fetching | Function that gets page HTML given URL |
-| +3 hr | Core checks 1-3 | Heading, meta description, schema detection |
-| +4 hr | Core checks 4-5 | FAQ detection, content structure analysis |
-| +5 hr | API endpoint | POST /api/scan returns full results |
-| EOD | **Milestone** | Backend API working locally |
+| +1 hr | ✅ Backend scaffold | Express app with /health endpoint |
+| +2 hr | ✅ HTML fetching | Axios + Cheerio implementation |
+| +3 hr | ✅ Core checks 1-3 | Heading, meta description, schema detection |
+| +4 hr | ✅ Core checks 4-5 | FAQ detection, content structure analysis |
+| +5 hr | ✅ API endpoint | POST /api/scan returns full results |
+| EOD | ✅ **Milestone** | Backend API working locally |
 
-### Day 2: Monday January 13
+### Day 2: Monday January 13 (Today - In Progress)
 
-| Time | Task | Deliverable |
-|------|------|-------------|
-| Morning | Deploy backend | Live API on Railway/Render |
-| +2 hr | Lovable frontend | Basic UI with URL input |
-| +3 hr | Connect frontend to API | Scan flow working end-to-end |
-| +4 hr | Results display | Score + recommendations rendering |
-| +5 hr | Polish & error handling | Loading states, error messages |
-| +6 hr | Mobile testing | Works on phone browsers |
-| Evening | **Milestone** | Full flow working on deployed URL |
+| Time | Task | Deliverable | Status |
+|------|------|-------------|--------|
+| Morning | ✅ Deploy backend | Live API on Railway | **DONE** |
+| Afternoon | 🚧 Lovable frontend | Basic UI with URL input | **IN PROGRESS** |
+| +2 hr | ⏸️ Connect frontend to API | Scan flow working end-to-end | Pending |
+| +3 hr | ⏸️ Results display | Score + recommendations rendering | Pending |
+| +4 hr | ⏸️ Polish & error handling | Loading states, error messages | Pending |
+| +5 hr | ⏸️ Mobile testing | Works on phone browsers | Pending |
+| Evening | ⏸️ **Milestone** | Full flow working on deployed URL | Target |
 
 ### Day 3: Tuesday January 14 (Event Day)
 
@@ -326,7 +338,37 @@ Always show exactly 5 recommendations, prioritized by:
 
 ---
 
-## 8. Post-MVP Roadmap (After Event)
+## 8. Deployment Information
+
+### Backend Deployment (✅ Complete)
+
+**URL:** https://baiaeo-production.up.railway.app
+**Platform:** Railway
+**Branch:** `claude/build-aeo-scanner-api-P7UL1`
+**Auto-deploy:** Enabled (pushes trigger new deployments)
+
+**Test Commands:**
+```bash
+# Health check
+curl https://baiaeo-production.up.railway.app/health
+
+# Full scan
+curl -X POST https://baiaeo-production.up.railway.app/api/scan \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+```
+
+### Frontend Deployment (🚧 Next Step)
+
+**Platform:** Lovable.dev → Vercel
+**API Integration:** Connect to https://baiaeo-production.up.railway.app
+
+**Lovable Build Prompt:**
+See Section 9 below for the complete Lovable prompt.
+
+---
+
+## 9. Post-MVP Roadmap (After Event)
 
 If the scanner is successful, future iterations could include:
 
