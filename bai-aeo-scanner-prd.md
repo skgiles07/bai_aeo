@@ -124,26 +124,44 @@ POST /api/email-results (STRETCH GOAL)
   Status: ⏸️ Not implemented yet
 ```
 
-### Frontend (Lovable)
+### Frontend (🚧 TO BUILD - Lovable)
+
+**Platform:** Lovable.dev (AI-powered frontend builder)
+**Deployment:** Auto-deploys to Vercel
+**Build Time:** ~5-10 minutes
+**URL:** https://lovable.dev
+
+**Brand Identity:**
+- Dark mode design with teal-to-purple gradient aesthetic
+- Colors: Teal #00D9D9 → Cyan #14B8A6 → Purple #6B5CFF → Violet #8B5CF6
+- Background: Dark slate #0F172A
+- Fonts: Futura Medium (headings), Avenir LT Std 45 Book (body), Shapiro 75 Heavy Wide (logo)
+- Style: Modern, tech-forward "AI energy" with aurora/gradient effects
 
 **Pages:**
 1. **Home/Scanner** — URL input, scan button, results display
 2. **About** (optional) — What is AEO, Birmingham AI branding
 
 **Components:**
-- URL input with validation
-- Scan button with loading state
-- Progress indicator (fake or real)
-- Results card with score visualization
-- 5 recommendation cards (expandable)
-- Email capture modal
+- URL input with gradient focus ring
+- Gradient scan button with loading state
+- Circular progress indicator (teal-to-purple gradient stroke)
+- Results card with glass-morphism effect
+- 5 check cards with gradient borders
+- 5 recommendation cards (expandable) with impact badges
+- Loading spinner with gradient animation
 - Error toast notifications
 
 **Styling:**
-- Birmingham AI brand colors (if available)
-- Clean, modern, mobile-responsive
+- Dark background with vibrant gradient accents
+- Glass-morphism cards with subtle shadows
+- Mobile-responsive design
 - Large touch targets for event use
-- High contrast for projector visibility
+- High contrast white text for projector visibility
+- Smooth animations and transitions
+
+**Complete Lovable Prompt:**
+See Appendix C below for the full prompt to paste into Lovable.
 
 ### Database (Supabase — Optional)
 
@@ -522,6 +540,153 @@ If the scanner is successful, future iterations could include:
 | Hosting (Frontend) | Lovable/Vercel | Auto-deploy from Lovable |
 | Database (Optional) | Supabase | Free tier, Postgres, easy auth |
 | Email (Optional) | Resend | Free tier, simple API |
+
+---
+
+## Appendix C: Complete Lovable Prompt
+
+Copy and paste this entire prompt into Lovable.dev to build the frontend:
+
+```
+Build a single-page AEO (Answer Engine Optimization) Scanner web application for Birmingham AI's 2026 Kickoff event.
+
+BRAND IDENTITY:
+- Use Birmingham AI's signature teal-to-purple gradient aesthetic
+- Dark mode design (dark slate/charcoal background #0F172A)
+- Gradient colors: Teal #00D9D9 → Cyan #14B8A6 → Purple #6B5CFF → Violet #8B5CF6
+- Typography:
+  * Headlines: Futura Medium or Shapiro 75 Heavy Wide
+  * Body: Avenir LT Std 45 Book (fallback: system sans-serif)
+  * Logo text: Shapiro 75 Heavy Wide
+- Style: Modern, tech-forward, "AI energy" aesthetic with aurora/gradient effects
+
+DESIGN REQUIREMENTS:
+- Dark background with vibrant gradient accents
+- Mobile-responsive (event attendees on phones)
+- Large, clear touch targets
+- High contrast white text on dark bg for projector visibility
+- Smooth gradient animations
+- Glass-morphism cards with subtle shadows
+- Glowing effects on interactive elements
+
+PAGE STRUCTURE:
+
+1. HERO SECTION
+   - Background: Dark with animated teal-to-purple gradient overlay
+   - Logo: "BIRMINGHAM AI" in Shapiro 75 Heavy Wide (top left)
+   - Headline: "Is Your Website Visible to AI?" (large, Futura Medium, white)
+   - Subheadline: "Get your free AEO score in 30 seconds" (Avenir, gray-300)
+   - URL input field with gradient border on focus
+   - Large gradient button "Scan My Site" (teal-to-purple gradient background)
+   - Small text: "Powered by Birmingham AI" with subtle glow
+
+2. RESULTS SECTION (shown after scan)
+   - Large circular progress indicator with gradient stroke (teal-to-purple)
+   - Overall score 0-100 in center (white, Futura Medium, 72px)
+   - Letter grade badge (A-F) with gradient background
+   - Scanned URL and timestamp (gray-400, Avenir)
+   - 5 check result cards in grid layout:
+     * Dark glass-morphism background
+     * Gradient left border (green=pass, red=fail)
+     * Pass/Fail icon with glow effect
+     * Check name (Futura Medium)
+     * Score and details (Avenir)
+     * Cards: Heading Hierarchy, Meta Description, Schema Markup, FAQ Section, Content Structure
+
+3. RECOMMENDATIONS SECTION
+   - Section title: "Your Personalized Recommendations" (Futura Medium, gradient text)
+   - 5 expandable recommendation cards
+   - Each card:
+     * Priority number in gradient circle
+     * Title (Futura Medium)
+     * Impact badge: High (red glow), Medium (orange glow), Maintaining (green glow)
+     * Effort level tag
+     * Summary text (Avenir, white)
+     * Expandable details section
+     * Gradient accent on hover
+
+4. LOADING STATE
+   - Animated gradient spinner (teal-to-purple rotation)
+   - "Scanning your website..." (Futura Medium)
+   - "This usually takes 15-30 seconds" (Avenir, gray-400)
+   - Progress bar with gradient fill
+
+5. ERROR HANDLING
+   - Toast notifications with gradient left border
+   - Clear error messages (Avenir)
+   - "Try Again" button with gradient hover effect
+
+API INTEGRATION:
+- Base URL: https://baiaeo-production.up.railway.app
+- GET /health endpoint
+- POST /api/scan with body: {"url": "https://example.com"}
+
+FUNCTIONALITY:
+- Auto-add https:// to URLs if missing
+- Disable scan button during loading
+- Smooth fade-in for results section
+- Scroll to results after scan
+- "Scan Another Site" button to reset
+- Gradient button hover effects
+
+COMPONENTS:
+- URLInput with gradient focus ring
+- CircularScore with gradient stroke animation
+- CheckCard with glass-morphism
+- RecommendationCard (expandable) with gradient accents
+- GradientButton component
+- LoadingSpinner with gradient animation
+- ErrorToast with gradient border
+
+STYLING:
+- Tailwind CSS + custom gradient utilities
+- Dark theme (#0F172A background)
+- Gradient text effects for headings
+- Glass-morphism cards (backdrop-blur)
+- Subtle glow effects on hover
+- Smooth transitions (300ms ease)
+- Mobile-first responsive
+
+COLOR PALETTE:
+- Background: #0F172A (slate-900)
+- Text primary: #FFFFFF
+- Text secondary: #94A3B8 (slate-400)
+- Gradient start: #00D9D9 (teal)
+- Gradient mid: #14B8A6 (cyan)
+- Gradient end: #8B5CF6 (purple)
+- Success: #10B981 (emerald-500)
+- Warning: #F59E0B (amber-500)
+- Error: #EF4444 (red-500)
+
+MUST HAVE:
+- Birmingham AI logo in header
+- Gradient backgrounds throughout
+- Dark mode aesthetic matching brand kit
+- Professional, event-ready polish
+- Fast performance for 300+ attendees
+
+Make it stunning, on-brand, and production-ready for tomorrow night's event!
+```
+
+---
+
+## Appendix D: Lovable Quick Start Guide
+
+1. Go to https://lovable.dev
+2. Sign in with GitHub
+3. Click "New Project"
+4. Paste the prompt from Appendix C above
+5. Wait 2-3 minutes for Lovable to build
+6. Test in the live preview
+7. Type "Deploy this to production" in chat
+8. Get your live URL from Vercel
+
+Common commands while building:
+- "Make the headline larger"
+- "Add more spacing between cards"
+- "Fix the mobile layout"
+- "Make the gradient more vibrant"
+- "Test the API connection"
 
 ---
 
