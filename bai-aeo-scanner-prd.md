@@ -241,12 +241,12 @@ Always show exactly 5 recommendations, prioritized by:
 - [x] Loading states
 
 ### OUT of Scope (Cut for MVP)
-- ❌ Multi-page crawling
+- ⏳ Multi-page crawling — **Planned for Phase 2**
 - ❌ PDF report generation
 - ❌ User accounts/authentication
 - ❌ Historical scan comparison
 - ❌ Competitor analysis
-- ❌ Full robots.txt parsing
+- ⏳ Full robots.txt parsing — **Planned for Phase 2**
 - ❌ Page speed testing (requires external API)
 - ❌ Backlink analysis
 
@@ -326,20 +326,200 @@ Always show exactly 5 recommendations, prioritized by:
 
 ---
 
-## 8. Post-MVP Roadmap (After Event)
+## 8. Phase 2: Multi-Page Scanning
 
-If the scanner is successful, future iterations could include:
+### Overview
+Phase 2 expands the scanner from homepage-only analysis to full website scanning, crawling all accessible pages to provide a comprehensive AEO audit.
 
-1. **Multi-page analysis** — Crawl 5-10 pages for comprehensive audit
-2. **PDF reports** — Branded downloadable reports
-3. **Email sequences** — Nurture leads with AEO tips
-4. **Competitive benchmarking** — Compare to industry averages
-5. **Tracking improvements** — Re-scan and show progress
-6. **White-label version** — For agencies to use with clients
+### Key Changes from Phase 1
+
+| Aspect | Phase 1 (MVP) | Phase 2 |
+|--------|---------------|---------|
+| Pages scanned | Homepage only | All crawlable pages |
+| Scan time | 15-30 seconds | 1-5 minutes (depending on site size) |
+| Results | Single page score | Site-wide score + per-page breakdown |
+| Recommendations | 5 recommendations | Prioritized list across all pages |
+
+### Technical Requirements
+
+#### Crawler Implementation
+```
+1. Start at homepage URL
+2. Extract all internal links from page
+3. Filter to same-domain links only
+4. Queue unique URLs for scanning
+5. Respect robots.txt directives
+6. Implement crawl depth limit (default: 3 levels)
+7. Implement page limit (default: 50 pages max)
+8. Handle rate limiting (1 request per second)
+```
+
+#### New API Endpoints
+```
+POST /api/scan-site
+  Request:  {
+    "url": "https://example.com",
+    "options": {
+      "maxPages": 50,
+      "maxDepth": 3,
+      "respectRobotsTxt": true
+    }
+  }
+  Response: {
+    "success": true,
+    "url": "https://example.com",
+    "scannedAt": "2026-01-20T10:00:00Z",
+    "pagesScanned": 23,
+    "siteScore": 58,
+    "siteGrade": "D+",
+    "pageResults": [...],
+    "aggregatedChecks": {...},
+    "prioritizedRecommendations": [...]
+  }
+
+GET /api/scan-status/:scanId
+  Response: {
+    "status": "in_progress",
+    "pagesScanned": 12,
+    "pagesQueued": 35,
+    "estimatedTimeRemaining": 45
+  }
+```
+
+#### Aggregated Scoring
+```javascript
+// Site-wide score = weighted average of all page scores
+const siteScore = pages.reduce((sum, page) => {
+  const weight = page.isHomepage ? 2.0 : 1.0; // Homepage weighted 2x
+  return sum + (page.score * weight);
+}, 0) / totalWeight;
+
+// Identify site-wide issues
+const siteWideIssues = {
+  pagesWithoutMeta: pages.filter(p => !p.checks.metaDescription.pass),
+  pagesWithBadHeadings: pages.filter(p => !p.checks.headingHierarchy.pass),
+  pagesWithoutSchema: pages.filter(p => !p.checks.schemaMarkup.pass),
+  // ... etc
+};
+```
+
+### New Features
+
+#### 1. Site Map Discovery
+- Parse sitemap.xml if available
+- Use sitemap URLs to prioritize crawling
+- Fall back to link-following if no sitemap
+
+#### 2. Page Type Detection
+- Identify page types: homepage, about, services, blog, contact, product, etc.
+- Apply type-specific scoring weights
+- Provide type-specific recommendations
+
+#### 3. Progress Tracking
+- Real-time scan progress via WebSocket or polling
+- Show pages discovered vs. pages scanned
+- Allow user to cancel long-running scans
+
+#### 4. Results Dashboard
+- Site-wide score overview
+- Per-page breakdown table (sortable by score)
+- Filter by issue type
+- Export full report (CSV/PDF)
+
+### UI Changes
+
+#### Scan Options Panel
+```
+┌─────────────────────────────────────────┐
+│ Scan Options                            │
+├─────────────────────────────────────────┤
+│ ○ Quick Scan (homepage only)            │
+│ ● Full Site Scan                        │
+│                                         │
+│   Max pages: [50 ▼]                     │
+│   Max depth: [3 ▼]                      │
+│   □ Include blog posts                  │
+│   ☑ Respect robots.txt                  │
+└─────────────────────────────────────────┘
+```
+
+#### Progress Display
+```
+┌─────────────────────────────────────────┐
+│ Scanning example.com...                 │
+│                                         │
+│ ████████████░░░░░░░░ 45%               │
+│                                         │
+│ Pages scanned: 23 / 50                  │
+│ Current: /services/plumbing             │
+│ Issues found: 12                        │
+│                                         │
+│ [Cancel Scan]                           │
+└─────────────────────────────────────────┘
+```
+
+### Performance Considerations
+
+| Constraint | Limit | Rationale |
+|------------|-------|-----------|
+| Max pages per scan | 50 | Keep scan time reasonable |
+| Max crawl depth | 3 levels | Avoid deep archive pages |
+| Request rate | 1/second | Be respectful to target servers |
+| Scan timeout | 5 minutes | Prevent runaway scans |
+| Concurrent scans per user | 1 | Prevent abuse |
+
+### Database Updates
+
+```sql
+-- Updated scans table for multi-page
+ALTER TABLE scans ADD COLUMN scan_type TEXT DEFAULT 'single'; -- 'single' or 'full'
+ALTER TABLE scans ADD COLUMN pages_scanned INTEGER DEFAULT 1;
+ALTER TABLE scans ADD COLUMN site_score INTEGER;
+
+-- New table for per-page results
+CREATE TABLE page_results (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  scan_id UUID REFERENCES scans(id) ON DELETE CASCADE,
+  page_url TEXT NOT NULL,
+  page_type TEXT,
+  score INTEGER,
+  checks JSONB,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_page_results_scan_id ON page_results(scan_id);
+```
+
+### Phase 2 Timeline (Estimated)
+
+| Week | Task |
+|------|------|
+| 1 | Implement crawler with depth/page limits |
+| 1 | Add sitemap.xml parsing |
+| 2 | Build aggregated scoring logic |
+| 2 | Create scan progress API |
+| 3 | Update frontend with scan options |
+| 3 | Build results dashboard |
+| 4 | Testing and optimization |
+| 4 | Deploy and monitor |
 
 ---
 
-## 9. Open Questions
+## 9. Future Roadmap (Post Phase 2)
+
+Additional features for future phases:
+
+1. **PDF reports** — Branded downloadable reports
+2. **Email sequences** — Nurture leads with AEO tips
+3. **Competitive benchmarking** — Compare to industry averages
+4. **Tracking improvements** — Re-scan and show progress over time
+5. **White-label version** — For agencies to use with clients
+6. **Scheduled scans** — Automated weekly/monthly monitoring
+7. **API access** — Allow developers to integrate scanning
+
+---
+
+## 10. Open Questions
 
 1. **Domain:** What URL will this live at? (aeo.birminghamai.org? scanner.birminghamai.org?)
 2. **Branding:** Do you have Birmingham AI logos/colors to use?
