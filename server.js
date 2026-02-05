@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { XMLParser } from 'fast-xml-parser';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,7 +16,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Scan endpoint
+// Scan endpoint (single page - existing)
 app.post('/api/scan', async (req, res) => {
   try {
     const { url } = req.body;
@@ -115,6 +116,426 @@ app.post('/api/scan', async (req, res) => {
     });
   }
 });
+
+// ============================================
+// PHASE 2: Multi-Page Site Scanning
+// ============================================
+
+// Helper: Filter to HTML pages only
+function isHtmlPage(url) {
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+
+    // Get the last segment of the path
+    const lastSegment = pathname.split('/').pop() || '';
+
+    // Only check extension if segment contains a dot and looks like a filename
+    const ext = lastSegment.includes('.') ? lastSegment.split('.').pop().toLowerCase() : '';
+
+    // If no extension or extension is very long (probably not a real extension), assume it's HTML
+    if (!ext || ext.length > 5) {
+      return true;
+    }
+
+    const nonHtmlExts = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'css', 'js', 'xml', 'json', 'zip', 'mp4', 'mp3', 'ico', 'woff', 'woff2', 'ttf', 'eot', 'txt', 'csv'];
+    return !nonHtmlExts.includes(ext);
+  } catch (e) {
+    return true; // If URL parsing fails, assume it might be HTML
+  }
+}
+
+// Page Discovery: Sitemap.xml parsing
+async function discoverFromSitemap(baseUrl, maxPages, depth = 0, maxDepth = 3) {
+  if (depth >= maxDepth) return [];
+
+  const sitemapUrl = depth === 0 ? `${baseUrl}/sitemap.xml` : baseUrl;
+
+  const response = await axios.get(sitemapUrl, {
+    timeout: 10000,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; BirminghamAI-AEO-Scanner/2.0)'
+    }
+  });
+
+  const parser = new XMLParser();
+  const result = parser.parse(response.data);
+
+  // Handle urlset (standard sitemap)
+  if (result.urlset?.url) {
+    const urls = result.urlset.url
+      .slice(0, maxPages)
+      .map(u => typeof u === 'string' ? u : u.loc)
+      .filter(Boolean);
+    return [...new Set(urls)]; // Dedupe
+  }
+
+  // Handle sitemap index (nested sitemaps)
+  if (result.sitemapindex?.sitemap) {
+    const childUrl = result.sitemapindex.sitemap[0]?.loc;
+    if (childUrl) {
+      return await discoverFromSitemap(childUrl, maxPages, depth + 1, maxDepth);
+    }
+  }
+
+  return [];
+}
+
+// Page Discovery: Link crawling fallback (BFS)
+async function discoverFromLinks(startUrl, maxPages, maxDepth = 2) {
+  const baseUrl = new URL(startUrl).origin;
+  const discovered = new Set([startUrl]);
+  const queue = [{ url: startUrl, depth: 0 }];
+
+  while (queue.length > 0 && discovered.size < maxPages) {
+    const { url, depth } = queue.shift();
+    if (depth >= maxDepth) continue;
+
+    try {
+      const response = await axios.get(url, {
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; BirminghamAI-AEO-Scanner/2.0)'
+        }
+      });
+      const $ = cheerio.load(response.data);
+
+      $('a[href]').each((_, el) => {
+        try {
+          const href = $(el).attr('href');
+          const absolute = new URL(href, url).href;
+          const cleanUrl = absolute.split('?')[0].split('#')[0]; // Strip query + fragment
+
+          if (cleanUrl.startsWith(baseUrl) && !discovered.has(cleanUrl)) {
+            discovered.add(cleanUrl);
+            queue.push({ url: cleanUrl, depth: depth + 1 });
+          }
+        } catch (e) { /* skip invalid URLs */ }
+      });
+    } catch (e) { /* skip failed pages */ }
+  }
+
+  return Array.from(discovered).slice(0, maxPages);
+}
+
+// Rate-limited concurrent crawl queue
+class CrawlQueue {
+  constructor(concurrency = 3, delayMs = 500) {
+    this.concurrency = concurrency;
+    this.delayMs = delayMs;
+  }
+
+  async processAll(urls, scanFn, onProgress, isAborted = () => false) {
+    const results = [];
+    let completed = 0;
+
+    for (let i = 0; i < urls.length; i += this.concurrency) {
+      if (isAborted()) break;
+
+      const batch = urls.slice(i, i + this.concurrency);
+
+      const batchResults = await Promise.all(
+        batch.map(async (url, idx) => {
+          if (isAborted()) return { url, error: 'Aborted' };
+
+          await this.wait(idx * this.delayMs);
+
+          const result = await scanFn(url);
+          completed++;
+          onProgress(url, result, completed, urls.length);
+          return { url, ...result };
+        })
+      );
+
+      results.push(...batchResults);
+
+      if (i + this.concurrency < urls.length && !isAborted()) {
+        await this.wait(this.delayMs);
+      }
+    }
+
+    return results;
+  }
+
+  wait(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+}
+
+// Scan a single page (extracted from /api/scan)
+async function scanPage(url) {
+  const response = await axios.get(url, {
+    timeout: 30000,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; BirminghamAI-AEO-Scanner/2.0)'
+    },
+    maxRedirects: 5
+  });
+
+  const $ = cheerio.load(response.data);
+
+  const checks = {
+    headingHierarchy: checkHeadingHierarchy($),
+    metaDescription: checkMetaDescription($),
+    schemaMarkup: checkSchemaMarkup($),
+    faqSection: checkFaqSection($),
+    contentStructure: checkContentStructure($)
+  };
+
+  const overallScore = Object.values(checks).reduce((sum, c) => sum + c.score, 0);
+  const scoreGrade = calculateGrade(overallScore);
+
+  return { checks, overallScore, scoreGrade };
+}
+
+// Aggregate results across all pages
+function aggregateResults(pageResults) {
+  // Handle empty results
+  if (!pageResults || pageResults.length === 0) {
+    return {
+      overallScore: 0,
+      scoreGrade: 'F',
+      totalPages: 0,
+      successfulScans: 0,
+      failedScans: 0,
+      siteIssues: [],
+      pageResults: [],
+      recommendations: []
+    };
+  }
+
+  // Calculate site-wide average score
+  const scores = pageResults.filter(r => r.overallScore !== undefined).map(r => r.overallScore);
+  const avgScore = scores.length > 0
+    ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+    : 0;
+
+  // Group issues by type across all pages
+  const issueGroups = {
+    headingHierarchy: { failed: [], passed: [] },
+    metaDescription: { failed: [], passed: [] },
+    schemaMarkup: { failed: [], passed: [] },
+    faqSection: { failed: [], passed: [] },
+    contentStructure: { failed: [], passed: [] }
+  };
+
+  pageResults.forEach(result => {
+    if (!result.checks) return;
+
+    Object.entries(result.checks).forEach(([checkType, checkResult]) => {
+      const bucket = checkResult.pass ? 'passed' : 'failed';
+      issueGroups[checkType][bucket].push({
+        url: result.url,
+        details: checkResult.details,
+        message: checkResult.message
+      });
+    });
+  });
+
+  // Generate site-wide summary
+  const siteIssues = Object.entries(issueGroups)
+    .filter(([_, group]) => group.failed.length > 0)
+    .map(([checkType, group]) => ({
+      checkType,
+      affectedPages: group.failed.length,
+      totalPages: pageResults.length,
+      percentage: Math.round((group.failed.length / pageResults.length) * 100),
+      pages: group.failed.slice(0, 5) // First 5 affected pages
+    }))
+    .sort((a, b) => b.affectedPages - a.affectedPages);
+
+  return {
+    overallScore: avgScore,
+    scoreGrade: calculateGrade(avgScore),
+    totalPages: pageResults.length,
+    successfulScans: scores.length,
+    failedScans: pageResults.length - scores.length,
+    siteIssues,
+    pageResults,
+    recommendations: generateSiteRecommendations(siteIssues, pageResults.length)
+  };
+}
+
+// Generate site-wide recommendations
+function generateSiteRecommendations(siteIssues, totalPages) {
+  const recs = [];
+
+  const titles = {
+    headingHierarchy: 'Fix Heading Structure',
+    metaDescription: 'Add/Improve Meta Descriptions',
+    schemaMarkup: 'Add Structured Data',
+    faqSection: 'Add FAQ Sections',
+    contentStructure: 'Improve Content Structure'
+  };
+
+  siteIssues.forEach((issue, idx) => {
+    recs.push({
+      priority: idx + 1,
+      title: titles[issue.checkType] || issue.checkType,
+      impact: issue.affectedPages >= totalPages * 0.5 ? 'High' :
+              issue.affectedPages >= totalPages * 0.25 ? 'Medium' : 'Low',
+      summary: `${issue.affectedPages} of ${totalPages} pages (${issue.percentage}%) have this issue`,
+      affectedUrls: issue.pages.map(p => p.url)
+    });
+  });
+
+  return recs.slice(0, 5); // Top 5 recommendations
+}
+
+// Multi-page site scan endpoint (SSE)
+app.post('/api/scan-site', async (req, res) => {
+  // Validate maxPages
+  const maxPages = Math.min(Math.max(1, parseInt(req.body.maxPages) || 25), 25);
+
+  let aborted = false;
+  let heartbeatInterval;
+  let timeoutId;
+
+  try {
+    const { url } = req.body;
+
+    // Validate URL
+    if (!url) {
+      return res.status(400).json({
+        success: false,
+        error: 'URL is required'
+      });
+    }
+
+    let normalizedUrl = url.trim();
+    if (!normalizedUrl.startsWith('http')) {
+      normalizedUrl = 'https://' + normalizedUrl;
+    }
+
+    let baseUrl;
+    try {
+      baseUrl = new URL(normalizedUrl).origin;
+    } catch (e) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please enter a valid website URL'
+      });
+    }
+
+    // Set SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.flushHeaders();
+
+    // Connection cleanup on client disconnect
+    res.on('close', () => {
+      aborted = true;
+      clearInterval(heartbeatInterval);
+      clearTimeout(timeoutId);
+    });
+
+    // Heartbeat every 15 seconds
+    heartbeatInterval = setInterval(() => {
+      if (!aborted) res.write(': heartbeat\n\n');
+    }, 15000);
+
+    // Overall timeout (5 minutes)
+    timeoutId = setTimeout(() => {
+      sendEvent({ type: 'error', message: 'Scan timed out after 5 minutes' });
+      aborted = true;
+      res.end();
+    }, 5 * 60 * 1000);
+
+    // Helper to send SSE events
+    const sendEvent = (data) => {
+      if (!aborted) res.write(`data: ${JSON.stringify(data)}\n\n`);
+    };
+
+    sendEvent({ type: 'started', url: baseUrl, maxPages });
+
+    // Discover pages
+    let urls = [];
+    let discoveryMethod = 'sitemap';
+
+    try {
+      urls = await discoverFromSitemap(baseUrl, maxPages);
+      if (urls.length === 0) throw new Error('Empty sitemap');
+    } catch (e) {
+      discoveryMethod = 'links';
+      urls = await discoverFromLinks(normalizedUrl, maxPages);
+    }
+
+    // Filter to HTML pages only
+    urls = urls.filter(isHtmlPage).slice(0, maxPages);
+
+    sendEvent({ type: 'discovered', method: discoveryMethod, count: urls.length, urls: urls.slice(0, 5) });
+
+    if (urls.length === 0 || aborted) {
+      if (!aborted) sendEvent({ type: 'error', message: 'No pages found to scan' });
+      clearInterval(heartbeatInterval);
+      clearTimeout(timeoutId);
+      res.end();
+      return;
+    }
+
+    // Scan pages with progress
+    const queue = new CrawlQueue(3, 500);
+
+    const pageResults = await queue.processAll(
+      urls,
+      async (pageUrl) => {
+        if (aborted) return { error: 'Scan aborted' };
+        try {
+          return await scanPage(pageUrl);
+        } catch (e) {
+          return {
+            error: e.message,
+            errorCode: e.code || 'UNKNOWN',
+            errorStatus: e.response?.status
+          };
+        }
+      },
+      (pageUrl, result, completed, total) => {
+        sendEvent({
+          type: 'progress',
+          completed,
+          total,
+          currentUrl: pageUrl,
+          score: result.overallScore || null,
+          error: result.error || null
+        });
+      },
+      () => aborted
+    );
+
+    // Aggregate and send final results
+    if (!aborted) {
+      const aggregated = aggregateResults(pageResults);
+      sendEvent({
+        type: 'complete',
+        results: {
+          ...aggregated,
+          scannedAt: new Date().toISOString(),
+          siteUrl: baseUrl
+        }
+      });
+    }
+
+    clearInterval(heartbeatInterval);
+    clearTimeout(timeoutId);
+    res.end();
+
+  } catch (error) {
+    console.error('Site scan error:', error);
+    clearInterval(heartbeatInterval);
+    clearTimeout(timeoutId);
+    if (!aborted) {
+      res.write(`data: ${JSON.stringify({ type: 'error', message: error.message })}\n\n`);
+    }
+    res.end();
+  }
+});
+
+// ============================================
+// Check Functions (shared by single & multi-page)
+// ============================================
 
 // Check 1: Heading Hierarchy
 function checkHeadingHierarchy($) {
@@ -315,7 +736,7 @@ function calculateGrade(score) {
   return 'F';
 }
 
-// Generate recommendations
+// Generate recommendations (single page)
 function generateRecommendations(checks) {
   const recommendations = [];
 
@@ -509,5 +930,6 @@ function generateRecommendations(checks) {
 app.listen(PORT, () => {
   console.log(`🚀 AEO Scanner API running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔍 Scan endpoint: http://localhost:${PORT}/api/scan`);
+  console.log(`🔍 Single page scan: http://localhost:${PORT}/api/scan`);
+  console.log(`🌐 Multi-page scan: http://localhost:${PORT}/api/scan-site`);
 });
