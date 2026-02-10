@@ -34,6 +34,19 @@ function EffortBadge({ effort }: { effort: string }) {
   );
 }
 
+function formatSummary(summary: string): string {
+  // Rewrite "X of Y pages (Z%) have this issue" to be clearer
+  const match = summary.match(/^(\d+) of (\d+) pages \((\d+)%\) have this issue$/);
+  if (match) {
+    const [, affected, total, pct] = match;
+    if (affected === total) {
+      return `All ${total} pages need this fix`;
+    }
+    return `${affected} of ${total} pages need this fix (${pct}%)`;
+  }
+  return summary;
+}
+
 export default function RecommendationList({
   recommendations,
 }: RecommendationListProps) {
@@ -55,11 +68,12 @@ export default function RecommendationList({
                   </span>
                   <p className="font-medium text-gray-900">{rec.title}</p>
                 </div>
-                <p className="text-sm text-gray-600">{rec.summary}</p>
+                <p className="text-sm text-gray-600">{formatSummary(rec.summary)}</p>
                 {rec.details && (
                   <p className="text-sm text-gray-500 mt-1">{rec.details}</p>
                 )}
-                {rec.learnMoreUrl && (
+                {rec.learnMoreUrl &&
+                  !rec.learnMoreUrl.includes("/aeo-guide") && (
                   <a
                     href={rec.learnMoreUrl}
                     target="_blank"
