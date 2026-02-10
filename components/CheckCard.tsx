@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 import type { CheckResult } from "@/lib/scan-types";
-
-const CHECK_LABELS: Record<string, string> = {
-  headingHierarchy: "Heading Structure",
-  metaDescription: "Meta Description",
-  schemaMarkup: "Schema Markup",
-  faqSection: "FAQ Section",
-  contentStructure: "Content Structure",
-};
+import { CHECK_LABELS } from "@/lib/constants";
 
 interface CheckCardProps {
   checkKey: string;
@@ -31,6 +24,8 @@ export default function CheckCard({ checkKey, check }: CheckCardProps) {
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        aria-controls={`check-detail-${checkKey}`}
         className="w-full flex items-center justify-between text-left"
       >
         <div className="flex items-center gap-3">
@@ -63,7 +58,7 @@ export default function CheckCard({ checkKey, check }: CheckCardProps) {
       </button>
 
       {expanded && check.details && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
+        <div id={`check-detail-${checkKey}`} role="region" className="mt-3 pt-3 border-t border-gray-200">
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
             {Object.entries(check.details).map(([key, value]) => (
               <div key={key}>

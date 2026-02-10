@@ -26,7 +26,9 @@ export default function PageAccordion({ pages }: PageAccordionProps) {
               <button
                 type="button"
                 onClick={() => setOpenIndex(isOpen ? null : i)}
-                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                aria-expanded={isOpen}
+                aria-controls={`page-panel-${i}`}
+                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-100 transition-colors"
               >
                 <span className="text-sm text-gray-700 truncate flex-1 mr-3">
                   {displayUrl}
@@ -66,7 +68,7 @@ export default function PageAccordion({ pages }: PageAccordionProps) {
               </button>
 
               {isOpen && page.checks && (
-                <div className="px-4 pb-4 space-y-2">
+                <div id={`page-panel-${i}`} role="region" className="px-4 pb-4 space-y-2">
                   {Object.entries(page.checks).map(([key, check]) => (
                     <CheckCard key={key} checkKey={key} check={check} />
                   ))}

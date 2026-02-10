@@ -1,17 +1,11 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import ScoreGauge from "@/components/ScoreGauge";
 import RecommendationList from "@/components/RecommendationList";
 import PageAccordion from "@/components/PageAccordion";
 import type { SiteResult } from "@/lib/scan-types";
-
-const CHECK_LABELS: Record<string, string> = {
-  headingHierarchy: "Heading Structure",
-  metaDescription: "Meta Description",
-  schemaMarkup: "Schema Markup",
-  faqSection: "FAQ Section",
-  contentStructure: "Content Structure",
-};
+import { CHECK_LABELS } from "@/lib/constants";
 
 interface SiteResultsProps {
   result: SiteResult;
@@ -34,7 +28,7 @@ export default function SiteResults({
       />
 
       {/* Stats bar */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="rounded-lg bg-white border border-gray-200 p-3 text-center">
           <p className="text-2xl font-bold text-gray-900">
             {result.totalPages}
@@ -100,10 +94,27 @@ export default function SiteResults({
       {/* Recommendations */}
       <RecommendationList recommendations={result.recommendations} />
 
+      {/* Join BAI CTA */}
+      <div className="rounded-xl border border-bai-blue/20 bg-bai-blue/5 p-5 text-center">
+        <p className="font-medium text-bai-navy">Want help improving your score?</p>
+        <p className="text-sm text-gray-600 mt-1">
+          Join Birmingham AI to learn AEO strategies at our next meetup.
+        </p>
+        <a
+          href="https://birminghamai.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => track("cta_clicked", { type: "join_bai", location: "site_results" })}
+          className="inline-block mt-3 px-5 py-2 rounded-lg bg-bai-blue text-white text-sm font-semibold hover:bg-bai-blue-dark transition-colors"
+        >
+          Learn More
+        </a>
+      </div>
+
       {/* Reset button */}
       <button
         onClick={onReset}
-        className="w-full py-3 px-6 rounded-lg bg-gray-200 text-gray-800 font-medium hover:bg-gray-300 transition-colors"
+        className="w-full py-3 px-6 rounded-lg border-2 border-bai-blue text-bai-blue font-semibold hover:bg-bai-blue hover:text-white transition-colors"
       >
         Scan Another Site
       </button>

@@ -59,6 +59,16 @@ export default function RecommendationList({
                 {rec.details && (
                   <p className="text-sm text-gray-500 mt-1">{rec.details}</p>
                 )}
+                {rec.learnMoreUrl && (
+                  <a
+                    href={rec.learnMoreUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-sm text-bai-blue hover:text-bai-blue-dark mt-1 underline"
+                  >
+                    Learn more
+                  </a>
+                )}
               </div>
               <div className="flex flex-col gap-1 shrink-0">
                 <ImpactBadge impact={rec.impact} />

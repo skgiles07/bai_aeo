@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://bai-aeo.vercel.app"),
   title: "AEO Scanner - Birmingham AI",
   description:
     "Check how your website performs in AI search results. Get actionable recommendations to improve your Answer Engine Optimization.",
@@ -22,12 +24,14 @@ export const metadata: Metadata = {
       "Is your website ready for AI search? Scan your site and get a free AEO score with actionable recommendations.",
     type: "website",
     siteName: "Birmingham AI",
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "AEO Scanner by Birmingham AI" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "AEO Scanner - Birmingham AI",
     description:
       "Is your website ready for AI search? Scan your site and get a free AEO score.",
+    images: ["/api/og"],
   },
 };
 
@@ -38,6 +42,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "AEO Scanner",
+              applicationCategory: "WebApplication",
+              operatingSystem: "Any",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+              description:
+                "Check how your website performs in AI search results. Get actionable recommendations to improve your Answer Engine Optimization.",
+              creator: {
+                "@type": "Organization",
+                name: "Birmingham AI",
+                url: "https://birminghamai.org",
+              },
+            }),
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
@@ -58,6 +84,7 @@ export default function RootLayout({
 
         {/* Main content */}
         <main className="flex-1">{children}</main>
+        <Analytics />
 
         {/* Footer */}
         <footer className="bg-bai-navy text-gray-400 mt-auto">

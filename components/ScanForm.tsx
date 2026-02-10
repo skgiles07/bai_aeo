@@ -83,12 +83,18 @@ export default function ScanForm({ onSubmit, isScanning }: ScanFormProps) {
         </div>
 
         {/* Scan Mode Toggle */}
-        <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+        <div
+          className="flex rounded-lg border border-gray-300 overflow-hidden"
+          role="radiogroup"
+          aria-label="Scan mode"
+        >
           <button
             type="button"
+            role="radio"
+            aria-checked={mode === "single"}
             onClick={() => setMode("single")}
             disabled={isScanning}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed ${
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-bai-blue focus-visible:ring-offset-2 ${
               mode === "single"
                 ? "bg-bai-blue text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -98,9 +104,11 @@ export default function ScanForm({ onSubmit, isScanning }: ScanFormProps) {
           </button>
           <button
             type="button"
+            role="radio"
+            aria-checked={mode === "site"}
             onClick={() => setMode("site")}
             disabled={isScanning}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-colors border-l border-gray-300 disabled:cursor-not-allowed ${
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-colors border-l border-gray-300 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-bai-blue focus-visible:ring-offset-2 ${
               mode === "site"
                 ? "bg-bai-blue text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50"

@@ -31,7 +31,14 @@ export default function ScanProgress({ progress, onAbort }: ScanProgressProps) {
           </span>
           <span>{pct}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+        <div
+          className="w-full bg-gray-200 rounded-full h-3 overflow-hidden"
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Scan progress: ${pct}%`}
+        >
           <div
             className="bg-bai-blue h-3 rounded-full transition-all duration-300 ease-out"
             style={{ width: `${pct}%` }}
@@ -52,9 +59,9 @@ export default function ScanProgress({ progress, onAbort }: ScanProgressProps) {
           {pageScores
             .slice()
             .reverse()
-            .map((page, i) => (
+            .map((page) => (
               <div
-                key={i}
+                key={page.url}
                 className="flex items-center justify-between px-3 py-2 text-sm"
               >
                 <span className="text-gray-700 truncate flex-1 mr-3">
