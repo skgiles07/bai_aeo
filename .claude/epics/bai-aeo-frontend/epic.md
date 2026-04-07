@@ -1,8 +1,9 @@
 ---
 name: bai-aeo-frontend
-status: backlog
+status: complete
 created: 2026-02-10T01:52:46Z
-progress: 0%
+completed: 2026-02-10
+progress: 100%
 prd: .claude/prds/bai-aeo-frontend.md
 github: https://github.com/skgiles07/bai_aeo/issues/1
 ---
@@ -66,13 +67,13 @@ No global state library. Results held in local state — lost on refresh (accept
 Each task builds on the previous. The app is functional after task 3 (single-page scans work end-to-end).
 
 ## Task Breakdown Preview
-- [ ] Task 1: Scaffold Next.js 15 project with Tailwind, API proxy rewrite to Railway, Vercel config
-- [ ] Task 2: Build ScanForm component — URL input, scan type toggle, validation, submit handler
-- [ ] Task 3: Build single-page results — ScoreGauge, CheckCard (x5), RecommendationList
-- [ ] Task 4: Add SSE client for site-wide scans — EventSource + useReducer + ScanProgress component
-- [ ] Task 5: Build SiteResults aggregate view — site issues summary, per-page accordion drill-down
-- [ ] Task 6: BAI branding, mobile-first responsive polish, OG meta tags, social sharing URL
-- [ ] Task 7: Deploy to Vercel, smoke test all scan paths, verify mobile experience
+- [x] Task 1: Scaffold Next.js 15 project with Tailwind, API proxy rewrite to Railway, Vercel config
+- [x] Task 2: Build ScanForm component — URL input, scan type toggle, validation, submit handler
+- [x] Task 3: Build single-page results — ScoreGauge, CheckCard (x5), RecommendationList
+- [x] Task 4: Add SSE client for site-wide scans — fetch+ReadableStream (not EventSource — POST required)
+- [x] Task 5: Build SiteResults aggregate view — site issues summary, per-page accordion drill-down
+- [x] Task 6: BAI branding, mobile-first responsive polish, OG meta tags (dynamic @vercel/og), social sharing
+- [x] Task 7: Deploy to Vercel, smoke test all scan paths, verify mobile experience
 
 ## Dependencies
 - **Railway API** must remain live at `mellow-blessing-production-df7c.up.railway.app` (already deployed, health check passing)
@@ -94,13 +95,13 @@ Each task builds on the previous. The app is functional after task 3 (single-pag
 - **Risk**: SSE through Vercel's edge network — may need to test streaming behavior. Fallback: direct Railway URL with CORS.
 
 ## Tasks Created
-- [ ] #5 - Scaffold Next.js 15 project with Tailwind and API proxy (parallel: false)
-- [ ] #6 - Build ScanForm component with URL input and scan type toggle (parallel: false, depends: #5)
-- [ ] #7 - Build single-page results dashboard (parallel: false, depends: #6)
-- [ ] #8 - Add SSE client for site-wide scans with progress UI (parallel: true, depends: #6)
-- [ ] #2 - Build site-wide aggregate results view (parallel: false, depends: #7, #8)
-- [ ] #3 - BAI branding, responsive polish, and OG tags (parallel: false, depends: #2)
-- [ ] #4 - Deploy to Vercel and smoke test (parallel: false, depends: #3)
+- [x] #5 - Scaffold Next.js 15 project with Tailwind and API proxy
+- [x] #6 - Build ScanForm component with URL input and scan type toggle
+- [x] #7 - Build single-page results dashboard
+- [x] #8 - Add SSE client for site-wide scans with progress UI (used fetch+ReadableStream, not EventSource)
+- [x] #2 - Build site-wide aggregate results view
+- [x] #3 - BAI branding, responsive polish, and OG tags (dynamic @vercel/og edge runtime)
+- [x] #4 - Deploy to Vercel and smoke test — live at https://bai-aeo.vercel.app
 
 Total tasks: 7
 Parallel tasks: 1 (tasks #7 and #8 can run concurrently after #6)

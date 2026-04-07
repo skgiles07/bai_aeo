@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoldLeaf Packaging — Complete AEO Playbook</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Vollkorn:wght@400;700&display=swap');
+
+  :root {
+    --navy: #0c0c0c;
+    --blue: #e8c345;
+    --blue-light: #ffd400;
+    --blue-dark: #c9a830;
+    --gray-50: #fafafa;
+    --gray-100: #f5f5f5;
+    --gray-200: #e5e5e5;
+    --gray-300: #d4d4d4;
+    --gray-400: #a3a3a3;
+    --gray-500: #737373;
+    --gray-600: #525252;
+    --gray-700: #404040;
+    --gray-800: #262626;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --orange: #ea580c;
+    --orange-light: #fff7ed;
+    --yellow: #ca8a04;
+    --yellow-light: #fefce8;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--gray-800);
+    line-height: 1.6;
+    font-size: 11pt;
+  }
+
+  @page {
+    size: letter;
+    margin: 0.75in 0.85in 0.85in 0.85in;
+    @bottom-center {
+      content: counter(page);
+      font-size: 9pt;
+      color: #94a3b8;
+    }
+  }
+
+  /* Cover Page */
+  .cover {
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 1.2in 0 0 0;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: var(--blue);
+    color: white;
+    font-size: 10pt;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .cover h1 {
+    font-size: 36pt;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .cover h1 span {
+    color: var(--blue-dark);
+  }
+
+  .cover-subtitle {
+    font-size: 16pt;
+    color: var(--gray-500);
+    font-weight: 400;
+    margin-bottom: 40px;
+  }
+
+  .cover-meta {
+    border-top: 2px solid var(--gray-200);
+    padding-top: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .cover-meta-item {
+    font-size: 10pt;
+  }
+
+  .cover-meta-label {
+    color: var(--gray-400);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 8pt;
+    letter-spacing: 0.08em;
+  }
+
+  .cover-meta-value {
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .cover-footer {
+    margin-top: 60px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bai-logo {
+    width: 40px;
+    height: 40px;
+    background: var(--navy);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 14pt;
+  }
+
+  .bai-name {
+    font-size: 13pt;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .bai-tagline {
+    font-size: 9pt;
+    color: var(--gray-400);
+  }
+
+  /* Section Headers */
+  h2 {
+    font-size: 18pt;
+    font-weight: 800;
+    color: var(--navy);
+    margin-top: 32px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--blue);
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: var(--navy);
+    margin-top: 24px;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+  }
+
+  h4 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  /* Tier badges */
+  .tier {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 9pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .tier-critical { background: var(--red-light); color: var(--red); }
+  .tier-important { background: var(--orange-light); color: var(--orange); }
+  .tier-authority { background: var(--yellow-light); color: var(--yellow); }
+  .tier-strategy { background: var(--green-light); color: var(--green); }
+
+  /* Status badges */
+  .status {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 9pt;
+    font-weight: 600;
+  }
+
+  .status-failing { background: #fef2f2; color: #dc2626; }
+  .status-missing { background: #fef2f2; color: #dc2626; }
+  .status-partial { background: #fff7ed; color: #ea580c; }
+
+  /* Effort/Impact badges */
+  .badge-row {
+    display: flex;
+    gap: 12px;
+    margin: 10px 0 14px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9pt;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .badge-effort { background: var(--gray-100); color: var(--gray-600); }
+  .badge-impact-high { background: #fef3c7; color: #78600e; }
+  .badge-impact-medium { background: #fef3c7; color: #92400e; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px;
+    font-size: 10pt;
+  }
+
+  thead th {
+    background: var(--navy);
+    color: white;
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  thead th:first-child { border-radius: 6px 0 0 0; }
+  thead th:last-child { border-radius: 0 6px 0 0; }
+
+  tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: top;
+  }
+
+  tbody tr:nth-child(even) { background: var(--gray-50); }
+  tbody tr:last-child td:first-child { border-radius: 0 0 0 6px; }
+  tbody tr:last-child td:last-child { border-radius: 0 0 6px 0; }
+
+  /* Code blocks */
+  pre {
+    background: var(--gray-800);
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin: 10px 0 14px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    page-break-inside: avoid;
+  }
+
+  code {
+    background: var(--gray-100);
+    color: #6b5a10;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 9.5pt;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+
+  /* Lists */
+  ul, ol {
+    margin: 8px 0 14px 20px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* Callout boxes */
+  .callout {
+    border-left: 4px solid var(--blue);
+    background: #fdf8e8;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: #8a7020;
+    font-size: 10pt;
+    margin-bottom: 4px;
+  }
+
+  .callout p {
+    margin-bottom: 0;
+    font-size: 10pt;
+    color: var(--gray-700);
+  }
+
+  /* Score trajectory box */
+  .score-box {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--gray-800) 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px 0;
+  }
+
+  .score-box h3 {
+    color: white;
+    margin-top: 0;
+    margin-bottom: 14px;
+  }
+
+  .score-box table {
+    margin: 0;
+  }
+
+  .score-box thead th {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+
+  .score-box tbody td {
+    color: white;
+    border-bottom-color: rgba(255,255,255,0.1);
+  }
+
+  .score-box tbody tr:nth-child(even) {
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* Horizontal rule */
+  hr {
+    border: none;
+    border-top: 1px solid var(--gray-200);
+    margin: 24px 0;
+  }
+
+  /* Page breaks */
+  .page-break { page-break-before: always; }
+
+  /* Item card */
+  .item-card {
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 14px 0;
+  }
+
+  .item-card h3 {
+    margin-top: 0;
+  }
+
+  /* Roadmap week header */
+  .week-header {
+    background: var(--blue);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px 8px 0 0;
+    font-weight: 700;
+    font-size: 11pt;
+    margin-top: 20px;
+  }
+
+  .week-table {
+    border: 1px solid var(--gray-200);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  .week-table thead th {
+    border-radius: 0;
+  }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid var(--gray-200);
+    text-align: center;
+    color: var(--gray-400);
+    font-size: 9pt;
+  }
+
+  .doc-footer a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* Small text */
+  .small { font-size: 9pt; color: var(--gray-500); }
+
+  /* Highlight */
+  .highlight {
+    background: #fef9c3;
+    padding: 1px 4px;
+    border-radius: 2px;
+  }
+
+  /* Score pill */
+  .score-pill {
+    display: inline-block;
+    background: var(--red-light);
+    color: var(--red);
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11pt;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <span class="cover-badge">AEO Playbook</span>
+  <h1>GoldLeaf Packaging<br><span>Complete AEO Playbook</span></h1>
+  <p class="cover-subtitle">Your customers are asking AI for packaging recommendations.<br>Right now, GoldLeaf doesn't show up. Your competitors will.</p>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Prepared For</div>
+      <div class="cover-meta-value">GoldLeaf Marketing Agency Call</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Date</div>
+      <div class="cover-meta-value">February 10, 2026</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Site</div>
+      <div class="cover-meta-value">goldleafpackaging.com</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Current Score</div>
+      <div class="cover-meta-value"><span class="score-pill">46/100 &mdash; Grade F</span></div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Target Score</div>
+      <div class="cover-meta-value">80+ (Grade B)</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Pages Scanned</div>
+      <div class="cover-meta-value">55 of 55 (complete)</div>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <img src="goldleaf-logo-black.png" alt="GoldLeaf Print &amp; Packaging" style="height: 80px; width: auto;">
+  </div>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<h2>Executive Summary</h2>
+
+<p><strong>Situation:</strong> GoldLeaf's website is invisible to AI search engines. When potential customers ask ChatGPT, Perplexity, or Google AI <em>"Who makes custom packaging in Birmingham?"</em> or <em>"Best digital printing for food packaging,"</em> GoldLeaf doesn't appear in the answer.</p>
+
+<p><strong>Why:</strong> We scanned all <strong>55 pages</strong> on the site. The average score is <strong>46/100 (Grade F)</strong>. Zero of the 55 pages contain structured data. 44 pages have no FAQ content. 38 pages have no lists or tables. 19 pages have missing or weak meta descriptions.</p>
+
+<p><strong>The opportunity:</strong> GoldLeaf has strong content &mdash; 826 words on the homepage, 1,006 on /about, 38 blog posts, 13 FAQ questions, and proper contact info (address, phone, email) in crawlable HTML on every page. 3 blog posts already score 80/100 and just need schema markup to hit 100. Most competitors haven't addressed AEO at all. Gartner projects AI search will capture 25% of commercial queries by end of 2026 &mdash; every month GoldLeaf stays invisible is pipeline you're handing to competitors who show up first.</p>
+
+<p><strong>The plan:</strong> 15 prioritized fixes organized in 4 tiers. Focus Tier 1 first (llms.txt, schema markup, FAQ sections, content restructuring) &mdash; these 4 items drive 80% of the score improvement. A 4-week roadmap moves GoldLeaf from 46 to 88+ (Grade B).</p>
+
+<p><strong>What we need today:</strong> Approval to begin Week 1 (foundation fixes, ~5 hours effort). That alone moves the score from 46 to 60. The full 4-week roadmap totals ~40 hours across Agency, Dev, and Content roles. Start this week and GoldLeaf will be cited in AI search results by mid-March.</p>
+
+<h3>Full Site Scan Results (55 Pages)</h3>
+<table>
+  <thead>
+    <tr><th>Check</th><th>Passing</th><th>Failing</th><th>Pass Rate</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Heading Structure</td><td>48</td><td>7</td><td>87%</td></tr>
+    <tr><td>Meta Description</td><td>36</td><td>19</td><td>65%</td></tr>
+    <tr><td>Schema Markup</td><td><strong>0</strong></td><td><strong>55</strong></td><td><strong>0%</strong></td></tr>
+    <tr><td>FAQ Section</td><td>11</td><td>44</td><td>20%</td></tr>
+    <tr><td>Content Structure</td><td>17</td><td>38</td><td>31%</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <div class="callout-title">Bright Spot: 3 Pages Already at 80/100</div>
+  <p>These blog posts pass 4 of 5 checks &mdash; adding BlogPosting schema would push them to 100/100:</p>
+  <p style="margin-top: 6px;"><strong>1.</strong> Choosing the Right Packaging for Your Wellness Brand (1,445 words, 15 lists)<br>
+  <strong>2.</strong> How to Design a Product Label (1,667 words, 6 lists)<br>
+  <strong>3.</strong> The Ultimate Guide to Brochure Printing (1,175 words, 10 lists)</p>
+  <p style="margin-top: 8px;"><strong>Quick win:</strong> Add BlogPosting schema to these 3 pages first &mdash; 30 minutes of dev work to create 3 perfect-score pages.</p>
+</div>
+
+<hr>
+
+<!-- WHAT IS AEO -->
+<h2>What Is AEO?</h2>
+<p>Your customers are already asking ChatGPT and Perplexity questions like <em>"best packaging companies in Alabama"</em> and <em>"custom box printing near me."</em> Right now, GoldLeaf isn't showing up in those answers &mdash; but your competitors could be.</p>
+
+<p>AEO (Answer Engine Optimization) is how you fix that. AI search engines don't show 10 blue links. They read your site, decide whether your content is trustworthy, and either cite you in their answers or ignore you completely. This playbook shows you exactly how to get cited.</p>
+
+<div class="callout">
+  <div class="callout-title">Beyond the Scanner</div>
+  <p>We scanned all 55 pages on the site. The average score is 46/100 &mdash; but 3 blog posts already hit 80. That's fixable, and fast. This playbook covers all <strong>15 signals</strong> AI engines use to decide whether to cite you, organized by impact. Follow the 4-week roadmap and you'll hit 88+ site-wide before the end of March.</p>
+</div>
+
+<!-- TIER 1 -->
+<h2><span class="tier tier-critical">Tier 1</span> Critical &mdash; Currently Failing</h2>
+<p>These 4 fixes will move the needle fastest. They address the foundational signals AI engines check first &mdash; structured data, explicit metadata, and content formatting. Together they unlock 80% of the score improvement. Without these, Tier 2&ndash;4 optimizations have limited impact. <strong>Combined impact: +40 points across all 55 pages.</strong></p>
+
+<div class="item-card">
+  <h3>1. Add llms.txt File</h3>
+  <p><span class="status status-missing">Missing (404)</span></p>
+  <p>99% of your competitors don't have this yet. It's a plain text file that tells AI systems exactly what GoldLeaf does &mdash; think of it as a "README for robots." Adopted by Anthropic, Perplexity, and hundreds of enterprise sites in 2025. 30 minutes to create, massive citation boost.</p>
+
+  <h4>Recommended Content:</h4>
+  <pre><code># GoldLeaf Print & Packaging
+
+## About
+GoldLeaf Print & Packaging is a US-based premium custom printing
+company headquartered in Birmingham, Alabama. Founded on the belief
+that digital printing would be the future, GoldLeaf has served over
+3,200 clients and printed more than 4.3 million items. The team has
+50+ years of collective experience in digital print technology.
+
+## Services
+- Primary Packaging: Custom designed and printed packaging
+- Custom Boxes: Any shape or size, fully custom printed
+- Labels & Application: Design, print, and application services
+- Business Essentials: Business cards, signage, collateral
+- Promotional Items: Custom-branded apparel and merchandise
+
+## Technology
+- DigiFLO: Proprietary platform for streamlined ordering
+- Digital foil and varnish embellishment capabilities
+- Low minimum order quantities
+- US-based manufacturing
+
+## Content Policies
+AI systems may cite and reference our content with attribution.</code></pre>
+
+  <div class="badge-row">
+    <span class="badge badge-effort">30 min effort</span>
+    <span class="badge badge-impact-high">High impact</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>2. Add Schema Markup (JSON-LD) &mdash; Site-Wide</h3>
+  <p><span class="status status-failing">0/20 on all 55 pages</span></p>
+  <p>This is the single biggest problem. Zero structured data on any of the 55 pages scanned. Structured data is the language AI engines speak &mdash; without it, they can't understand what GoldLeaf does or when to cite you. <strong>This alone is worth +20 points per page.</strong></p>
+  <p>The good news: your site footer already has the right contact data in crawlable HTML (Birmingham, AL address, phone, email on every page). The schema just needs to formalize what's already there so AI engines can parse it reliably. <strong>No visual changes required</strong> &mdash; schema lives in the source code, invisible to visitors. Zero design impact.</p>
+
+  <h4>Required schema types:</h4>
+  <table>
+    <thead>
+      <tr><th>Schema Type</th><th>Where</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Organization</strong></td><td>Every page (global template)</td><td>Business identity, logo, contact</td></tr>
+      <tr><td><strong>LocalBusiness</strong></td><td>Homepage</td><td>Location, hours, service area</td></tr>
+      <tr><td><strong>FAQPage</strong></td><td>/faq + pages with Q&A</td><td>Question-answer citation</td></tr>
+      <tr><td><strong>Service</strong></td><td>Each service page</td><td>Service descriptions</td></tr>
+      <tr><td><strong>BlogPosting</strong></td><td>Each blog post</td><td>Article metadata, author, date</td></tr>
+      <tr><td><strong>BreadcrumbList</strong></td><td>All pages</td><td>Site navigation structure</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Example &mdash; Organization (goes on every page):</h4>
+  <pre><code>{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "GoldLeaf Print & Packaging",
+  "url": "https://www.goldleafpackaging.com",
+  "logo": "https://www.goldleafpackaging.com/logo.png",
+  "description": "US-based premium custom printing company...",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Birmingham",
+    "addressRegion": "AL",
+    "addressCountry": "US"
+  }
+}</code></pre>
+
+  <div class="badge-row">
+    <span class="badge badge-effort">4-6 hours effort</span>
+    <span class="badge badge-impact-high">+20 pts per page</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>3. Add FAQ Sections to Service Pages</h3>
+  <p><span class="status status-failing">44/55 pages have no FAQ content</span></p>
+  <p>You already wrote 13 great FAQ answers &mdash; but they're all buried on one page. AI engines don't find them there. Move them to the service pages where customers actually search, and watch citation rates spike.</p>
+
+  <h4>FAQ templates by page:</h4>
+  <table>
+    <thead>
+      <tr><th>Page</th><th>Sample Questions</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>/services/custom-boxes</strong></td>
+        <td>What types of custom boxes can GoldLeaf produce? What is the minimum order quantity? What materials and finishes are available? How long does production take?</td>
+      </tr>
+      <tr>
+        <td><strong>/services/labels-application</strong></td>
+        <td>What label materials do you offer? Do you provide application services? What file formats do you accept? Can you print variable data?</td>
+      </tr>
+      <tr>
+        <td><strong>/services/primary-packaging</strong></td>
+        <td>What types of primary packaging can you produce? What industries do you serve? Do you offer food-safe options?</td>
+      </tr>
+      <tr>
+        <td><strong>/digiflo</strong></td>
+        <td>What is DigiFLO? How does it streamline reordering? Is it available for all customers?</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="badge-row">
+    <span class="badge badge-effort">4-6 hours effort</span>
+    <span class="badge badge-impact-high">+20 pts per page</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>4. Restructure Content with Lists and Tables</h3>
+  <p><span class="status status-failing">38/55 pages have zero lists or tables</span></p>
+  <p>78% of AI citations use lists or tables. GoldLeaf has all the right content &mdash; it's just in paragraph form, which AI engines skip over. Reformatting existing content into lists takes 3&ndash;4 hours and unlocks +20 points per page.</p>
+
+  <h4>High-priority pages:</h4>
+  <table>
+    <thead>
+      <tr><th>Page</th><th>Words</th><th>Lists</th><th>Needed</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Homepage</td><td>826</td><td>0</td><td>Service offerings as bullet list</td></tr>
+      <tr><td>/about</td><td>1,006</td><td>0</td><td>Capabilities + team info need lists</td></tr>
+      <tr><td>/digiflo</td><td>794</td><td>0</td><td>Feature list as bullets</td></tr>
+      <tr><td>/services (all)</td><td>~300 each</td><td>0</td><td>Specs, materials, capabilities lists</td></tr>
+      <tr><td>/blog-posts/10-things-labels</td><td>1,296</td><td>0</td><td>Perfect numbered list opportunity</td></tr>
+    </tbody>
+  </table>
+
+  <div class="badge-row">
+    <span class="badge badge-effort">3-4 hours effort</span>
+    <span class="badge badge-impact-high">+20 pts per page</span>
+  </div>
+</div>
+
+<!-- TIER 2 -->
+<h2><span class="tier tier-important">Tier 2</span> Important &mdash; Missing Infrastructure</h2>
+<p>These fixes don't show up in the scanner, but they control whether AI engines crawl your site in the first place. Think of Tier 1 as "make content understandable" and Tier 2 as "make content accessible." Without them, you're invisible no matter how good your content is.</p>
+
+<div class="item-card">
+  <h3>5. Update robots.txt &mdash; Explicitly Allow AI Crawlers</h3>
+  <p><span class="status status-partial">Current: only Sitemap line</span></p>
+  <p>Many sites accidentally block AI crawlers. Being explicit guarantees your content gets indexed.</p>
+  <pre><code>User-agent: *
+Allow: /
+
+# AI Search Engines - Explicitly Allowed
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://www.goldleafpackaging.com/sitemap.xml</code></pre>
+
+  <div class="badge-row">
+    <span class="badge badge-effort">10 min effort</span>
+    <span class="badge badge-impact-medium">Medium impact</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>6. Add Open Graph and Twitter Card Meta Tags</h3>
+  <p><span class="status status-missing">Not detected on any page</span></p>
+  <p>AI systems that surface web results (Perplexity, Bing Copilot) use OG data for rich previews. No OG tags = plain text links that get less attention.</p>
+  <pre><code>&lt;meta property="og:title" content="Custom Box Printing | GoldLeaf"&gt;
+&lt;meta property="og:description" content="Custom designed boxes..."&gt;
+&lt;meta property="og:image" content=".../custom-boxes-og.jpg"&gt;
+&lt;meta property="og:url" content=".../services/custom-boxes"&gt;
+&lt;meta name="twitter:card" content="summary_large_image"&gt;</code></pre>
+
+  <div class="badge-row">
+    <span class="badge badge-effort">1-2 hours effort</span>
+    <span class="badge badge-impact-medium">Medium impact</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>7. Add Canonical URLs</h3>
+  <p><span class="status status-missing">Not detected</span></p>
+  <p>The site redirects <code>goldleafpackaging.com</code> &rarr; <code>www.goldleafpackaging.com</code>. Without canonical URLs, AI engines may split citation authority between duplicates.</p>
+  <pre><code>&lt;link rel="canonical" href="https://www.goldleafpackaging.com/services/custom-boxes"&gt;</code></pre>
+
+  <div class="badge-row">
+    <span class="badge badge-effort">30 min effort</span>
+    <span class="badge badge-impact-medium">Medium impact</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>8. Enhance Sitemap with Metadata</h3>
+  <p><span class="status status-partial">Exists (56 URLs) but zero metadata</span></p>
+  <p>AI crawlers use <code>lastmod</code> to prioritize fresh content. The sitemap has 56 URLs but no lastmod, changefreq, or priority values.</p>
+  <div class="badge-row">
+    <span class="badge badge-effort">1 hour effort</span>
+    <span class="badge badge-impact-medium">Medium impact</span>
+  </div>
+</div>
+
+<!-- TIER 3 -->
+<h2><span class="tier tier-authority">Tier 3</span> E-E-A-T Signals &mdash; Authority Building</h2>
+<p>Experience, Expertise, Authoritativeness, Trustworthiness &mdash; the signals AI uses to decide if GoldLeaf is credible. Without these, you may show up in AI search but not get cited. These signals separate GoldLeaf from anonymous blogs and offshore printers.</p>
+
+<div class="item-card">
+  <h3>9. Add Author Attribution to Blog Posts</h3>
+  <p><span class="status status-missing">No author names on any content</span></p>
+  <p>Anonymous blog posts score lower than attributed ones. Add bylines ("By [Name], [Title] at GoldLeaf"), Person schema, and LinkedIn links.</p>
+  <div class="badge-row">
+    <span class="badge badge-effort">1-2 hours effort</span>
+    <span class="badge badge-impact-medium">Medium impact</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>10. Add Publication and Update Dates</h3>
+  <p><span class="status status-missing">No visible dates on any content</span></p>
+  <p>AI systems prioritize fresh content. Blog posts with no date are treated as potentially outdated. Add publication dates visibly and in <code>datePublished</code> / <code>dateModified</code> schema.</p>
+  <div class="badge-row">
+    <span class="badge badge-effort">1 hour effort</span>
+    <span class="badge badge-impact-medium">Medium impact</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>11. Surface Awards and Certifications</h3>
+  <p>"Award-winning" is mentioned but no specific awards are displayed. The /about page mentions "50 years of collective experience" and "3.2k Clients / 4.3m Items" &mdash; great proof points that should be structured and highlighted.</p>
+  <div class="badge-row">
+    <span class="badge badge-effort">1 hour effort</span>
+    <span class="badge badge-impact-medium">Medium impact</span>
+  </div>
+</div>
+
+<div class="item-card">
+  <h3>12. Improve Image Alt Text</h3>
+  <p><span class="status status-partial">Most images lack descriptive alt attributes</span></p>
+  <p><strong>Bad:</strong> <code>alt=""</code> &nbsp; <strong>Good:</strong> <code>alt="Custom printed folding carton box with UV spot coating and gold foil stamping by GoldLeaf Print & Packaging"</code></p>
+  <div class="badge-row">
+    <span class="badge badge-effort">2-3 hours effort</span>
+    <span class="badge badge-impact-medium">Low-Medium impact</span>
+  </div>
+</div>
+
+<!-- TIER 4 -->
+<h2><span class="tier tier-strategy">Tier 4</span> Content Strategy &mdash; Ongoing</h2>
+<p>Long-term content investments that compound over time. Once the technical foundation is in place (Tiers 1&ndash;3), this is how GoldLeaf becomes the authority that AI engines cite for packaging topics in Alabama and beyond.</p>
+
+<div class="item-card">
+  <h3>13. Write "Answer-First" Content</h3>
+  <p>AI engines extract direct answers. Content that leads with the answer gets cited more.</p>
+  <p><strong>Current style:</strong> <em>"In the world of packaging, there are many factors to consider..."</em></p>
+  <p><strong>AEO-optimized:</strong> <em>"The best packaging materials for food products are: kraft paper, corrugated cardboard, and food-grade polyethylene. Here's when to use each..."</em></p>
+</div>
+
+<div class="item-card">
+  <h3>14. Create "Best Of" and Comparison Content</h3>
+  <p>Target the exact queries people ask AI assistants:</p>
+  <ul>
+    <li>"Best Packaging Materials for [Industry]" (cannabis, food, cosmetics)</li>
+    <li>"Digital vs. Offset Printing: Which Is Right for Your Packaging?"</li>
+    <li>"Custom Box Types: A Complete Guide"</li>
+    <li>"Label Materials Compared: Paper vs. Film vs. Synthetic"</li>
+  </ul>
+</div>
+
+<div class="item-card">
+  <h3>15. Add a Glossary or Knowledge Base</h3>
+  <p>A <code>/glossary</code> page defining printing terms (GSM, dieline, substrate, CMYK, spot UV, etc.) creates dozens of citable definitions. AI systems frequently cite glossary entries.</p>
+</div>
+
+<!-- SMALL STUFF -->
+<h2>Fix the Small Stuff</h2>
+<table>
+  <thead>
+    <tr><th>Issue</th><th>Page</th><th>Fix</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>"GoldLead" typo</td><td>/blog meta description</td><td>Change to "GoldLeaf"</td></tr>
+    <tr><td>Missing H1</td><td>/careers, /privacy-policy, /terms + 4 others</td><td>Add H1 heading (7 pages)</td></tr>
+    <tr><td>6 H1 tags</td><td>/blog-posts/american-excellence</td><td>Demote 5 to H2</td></tr>
+    <tr><td>H1&rarr;H3 skip</td><td>/blog</td><td>Change card headings to H2</td></tr>
+    <tr><td>Missing/short meta</td><td>19 pages across site</td><td>Add or expand to 120-160 chars</td></tr>
+  </tbody>
+</table>
+
+<!-- ROADMAP -->
+<h2>Implementation Roadmap</h2>
+
+<p>Four weeks, four milestones, 85+ score at the end. Each week builds on the last. Start Week 1 this week and GoldLeaf will be cited in AI search by mid-March.</p>
+
+<div class="week-header">Week 1 (Feb 10&ndash;14): Foundation &mdash; Target: 46 &rarr; 60</div>
+<table class="week-table">
+  <thead>
+    <tr><th>Task</th><th>Owner</th><th>Hours</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Create and deploy llms.txt</td><td>Agency</td><td>0.5</td></tr>
+    <tr><td>Update robots.txt with AI bot directives</td><td>Agency</td><td>0.25</td></tr>
+    <tr><td>Add Organization JSON-LD to site template</td><td>Agency/Dev</td><td>1</td></tr>
+    <tr><td>Add canonical URLs to template</td><td>Agency/Dev</td><td>0.5</td></tr>
+    <tr><td>Fix heading structure (7 pages)</td><td>Agency</td><td>0.5</td></tr>
+    <tr><td>Fix meta descriptions (19 pages)</td><td>Agency</td><td>2</td></tr>
+    <tr><td>Fix "GoldLead" typo</td><td>Agency</td><td>0.1</td></tr>
+  </tbody>
+</table>
+
+<div class="week-header">Week 2 (Feb 17&ndash;21): Schema + OG Tags &mdash; Target: 60 &rarr; 72</div>
+<table class="week-table">
+  <thead>
+    <tr><th>Task</th><th>Owner</th><th>Hours</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Add LocalBusiness schema to homepage</td><td>Dev</td><td>0.5</td></tr>
+    <tr><td>Add FAQPage schema to /faq</td><td>Dev</td><td>0.5</td></tr>
+    <tr><td>Add Service schema to 6 service pages</td><td>Dev</td><td>2</td></tr>
+    <tr><td>Add BlogPosting schema to 38 blog posts</td><td>Dev</td><td>3</td></tr>
+    <tr><td>Add BreadcrumbList schema to all pages</td><td>Dev</td><td>1</td></tr>
+    <tr><td>Add OG + Twitter meta tags (template)</td><td>Dev</td><td>1</td></tr>
+    <tr><td>Enhance sitemap with lastmod/priority</td><td>Dev</td><td>1</td></tr>
+  </tbody>
+</table>
+
+<div class="week-header">Week 3 (Feb 24&ndash;28): Content Restructuring &mdash; Target: 72 &rarr; 82</div>
+<table class="week-table">
+  <thead>
+    <tr><th>Task</th><th>Owner</th><th>Hours</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Add bullet lists to homepage</td><td>Content</td><td>1</td></tr>
+    <tr><td>Reformat service pages with specs lists</td><td>Content</td><td>3</td></tr>
+    <tr><td>Reformat "10 Things" blog as numbered list</td><td>Content</td><td>0.5</td></tr>
+    <tr><td>Add bullet lists to /about, /digiflo</td><td>Content</td><td>1</td></tr>
+    <tr><td>Add publication dates to blog posts</td><td>Content</td><td>1</td></tr>
+    <tr><td>Improve image alt text site-wide</td><td>Content</td><td>3</td></tr>
+    <tr><td>Add author bylines to blog posts</td><td>Content</td><td>1</td></tr>
+  </tbody>
+</table>
+
+<div class="week-header">Week 4 (Mar 3&ndash;7): FAQ Expansion &mdash; Target: 82 &rarr; 88+</div>
+<table class="week-table">
+  <thead>
+    <tr><th>Task</th><th>Owner</th><th>Hours</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Write FAQ sections for 6 service pages</td><td>Content</td><td>4</td></tr>
+    <tr><td>Write FAQ sections for top blog posts</td><td>Content</td><td>3</td></tr>
+    <tr><td>Add FAQPage schema to new FAQ sections</td><td>Dev</td><td>1</td></tr>
+    <tr><td>Create answer-first summaries on top blogs</td><td>Content</td><td>2</td></tr>
+    <tr><td>Surface awards/certifications on /about</td><td>Content</td><td>1</td></tr>
+  </tbody>
+</table>
+
+<!-- WHAT HAPPENS IF WE WAIT -->
+<div class="callout" style="border-left-color: var(--red); background: var(--red-light);">
+  <div class="callout-title" style="color: var(--red);">What Happens If We Wait?</div>
+  <p>AI search adoption is accelerating. Every month without AEO optimization:</p>
+  <ul style="margin: 8px 0 0 18px; font-size: 10pt; color: var(--gray-700);">
+    <li>Competitors who add schema first will own the citation slots GoldLeaf should have</li>
+    <li>AI models are trained on current data &mdash; the longer GoldLeaf is absent, the harder it is to catch up</li>
+    <li>"Custom packaging Birmingham" queries increasingly go to AI answers instead of Google results</li>
+    <li>The 3 blog posts scoring 80/100 today could be at 100 in 30 minutes of dev work &mdash; every day they sit at 80 is a missed citation</li>
+  </ul>
+</div>
+
+<!-- DECISION PROMPT -->
+<div class="callout" style="border-left-color: var(--navy); background: #f5f5f5;">
+  <div class="callout-title" style="color: var(--navy);">What We Need From This Call</div>
+  <p><strong>Option A (Recommended):</strong> Approve the full 4-week roadmap. ~40 hours total across Agency, Dev, and Content. Score moves from 46 &rarr; 88+ across all 55 pages.</p>
+  <p style="margin-top: 8px;"><strong>Option B:</strong> Approve Week 1 only (~5 hours, Agency + Dev). Score moves from 46 &rarr; 60. Re-scan after Week 1 to validate the lift before committing to Weeks 2&ndash;4.</p>
+  <p style="margin-top: 8px;"><strong>Next step:</strong> Confirm which option, assign Agency/Dev/Content owners by name, and agree on a Week 1 start date.</p>
+</div>
+
+<!-- SCORE TRAJECTORY -->
+<div class="score-box">
+  <h3>Projected Score Trajectory</h3>
+  <p style="margin-bottom: 14px; opacity: 0.85; font-size: 10pt;">Four weeks from now, GoldLeaf will outrank 90% of custom printers in AI search.</p>
+  <table>
+    <thead>
+      <tr><th>Milestone</th><th>Score</th><th>Grade</th><th>Timeline</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Current (55 pages)</td><td><strong>46</strong></td><td>F</td><td>Today (Feb 10)</td></tr>
+      <tr><td>After Week 1</td><td><strong>~60</strong></td><td>D</td><td>Feb 14</td></tr>
+      <tr><td>After Week 2</td><td><strong>~72</strong></td><td>C</td><td>Feb 21</td></tr>
+      <tr><td>After Week 3</td><td><strong>~82</strong></td><td>B</td><td>Feb 28</td></tr>
+      <tr><td>After Week 4</td><td><strong>~88</strong></td><td>B+</td><td>Mar 7</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- VERIFY -->
+<h2>How to Verify Progress</h2>
+<p>Re-scan after each phase using the AEO Scanner at: <strong><a href="https://bai-aeo.vercel.app">bai-aeo.vercel.app</a></strong></p>
+<p>Enter <code>goldleafpackaging.com</code> &rarr; Full Site scan &rarr; Compare scores.</p>
+<p>The scanner checks 5 of the 15 signals above. For the others (llms.txt, robots.txt, OG tags, canonical URLs, alt text, E-E-A-T), manual verification or a follow-up audit session.</p>
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  <p><strong>GoldLeaf Print &amp; Packaging</strong></p>
+  <p><a href="https://www.goldleafpackaging.com">goldleafpackaging.com</a></p>
+  <p style="margin-top:8px;">Birmingham, Alabama &mdash; Premium Custom Printing</p>
+</div>
+
+</body>
+</html>

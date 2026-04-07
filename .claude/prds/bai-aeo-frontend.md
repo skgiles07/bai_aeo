@@ -1,8 +1,9 @@
 ---
 name: bai-aeo-frontend
 description: Next.js frontend for the Birmingham AI AEO Scanner with real-time scan progress, results dashboard, and Vercel deployment
-status: draft
+status: complete
 created: 2026-02-10T01:51:10Z
+completed: 2026-02-10
 ---
 
 # PRD: BAI AEO Scanner Frontend
@@ -49,9 +50,10 @@ A Next.js web application deployed on Vercel that provides:
 - Social sharing: "I scored X on the BAI AEO Scanner" with OG image
 - Footer with Birmingham AI links
 
-### FR5: Share & Export
-- Shareable results URL (query param or short ID)
-- "Download PDF Report" button (stretch goal)
+### FR5: Share & Export *(partially implemented — remainder deferred)*
+- [x] Share buttons (X + LinkedIn) — implemented via ScoreGauge component
+- [ ] Shareable results permalink URL — **deferred/parked** (see CLAUDE.md future improvements)
+- [ ] "Download PDF Report" button — **deferred/parked**
 
 ## Non-Functional Requirements
 
